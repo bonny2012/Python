@@ -1,0 +1,79 @@
+import numpy as np
+import time
+
+inf = float('inf')
+
+a=[
+    [inf,1,1,1,inf,inf,inf,inf,inf,inf,inf],
+    [inf,inf,1,inf,inf,inf,inf,inf,inf,inf,inf],
+    [inf,inf,inf,1,1,inf,inf,inf,inf,inf,inf],
+    [inf,inf,inf,inf,1,1,1,inf,inf,inf,inf],
+    [inf,inf,inf,inf,inf,inf,1,1,inf,inf,inf],
+    [inf,inf,inf,inf,inf,inf,inf,1,inf,inf,inf],
+    [inf,inf,inf,inf,inf,inf,inf,inf,1,1,inf],
+    [inf,inf,inf,inf,inf,inf,inf,inf,1,1,1],
+    [inf,inf,inf,inf,inf,inf,inf,inf,inf,inf,1],
+    [inf,inf,inf,inf,inf,inf,inf,inf,inf,inf,1],
+    [inf,inf,inf,inf,inf,inf,inf,inf,inf,inf,inf]]
+
+ancestor_dic = {}  # a dictionary for node ancestor
+distance_dic = {}  # a dictionary for node current weight
+color_dic = {} # a dictionary for node color
+
+visiting = [] # create an empty list for visited nodes
+
+def bread_first(graph,start,end):
+    start = start -1
+    end = end-1
+    #vetex = []
+    #vetex.extend(range(len(graph)))  # create node list
+    distance_dic[start] = 0 # Assign distance for start node as 0
+    color_dic[start] = 'GRAY'
+    # Assign all other distance value as infinity
+    for i in range(start+1, len(graph)):
+        distance_dic[i] = inf
+
+    # Assign value of ancestor of each node to null
+    for i in range(start, len(graph)):
+         ancestor_dic[i] = ''     
+
+    for i in range(start+1, len(graph)):
+         color_dic[i] = 'WHITE'
+
+    print(color_dic)
+
+    visiting.append(start)
+    #vetex.pop(start)
+
+    while visiting:
+        u = visiting.pop(0)
+        print('I am U: ',u)
+        for i in range(start, len(graph)):
+    
+            if graph[u][i] != inf and color_dic[i]=='WHITE':
+                color_dic[i] = 'GRAY'
+                print("I am new i: ", i, '. color is : ', color_dic[i])
+                ancestor_dic[i] = u
+                distance_dic[i] = distance_dic[u] + 1
+                visiting.append(i)
+        color_dic[u] = 'BLACK'
+        print('This is U: ', u, 'This is u color', color_dic[u])
+
+
+    i = end#trace back the path
+    route = [i]
+    while i != 0:
+        route.append(ancestor_dic.get(i))
+        i = ancestor_dic.get(i)
+
+    # a = list(map(lambda x: x + 1, a)) another way to add same value to a list
+    route = np.array(route) + 1
+
+    return route,distance_dic[end]
+
+path,distance =bread_first(a,1,11)
+print("Here is the path: ", path)
+
+print('distance is : ', distance)
+print("\nRunning time is: " + str(time.process_time()) + " seconds." )
+

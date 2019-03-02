@@ -1,0 +1,81 @@
+import numpy as np
+import time
+
+inf = float('inf')
+
+a=[
+    [inf,1,1,1,inf,inf,inf,inf,inf,inf,inf],
+    [inf,inf,1,inf,inf,inf,inf,inf,inf,inf,inf],
+    [inf,inf,inf,1,1,inf,inf,inf,inf,inf,inf],
+    [inf,inf,inf,inf,1,1,1,inf,inf,inf,inf],
+    [inf,inf,inf,inf,inf,inf,1,1,inf,inf,inf],
+    [inf,inf,inf,inf,inf,inf,inf,1,inf,inf,inf],
+    [inf,inf,inf,inf,inf,inf,inf,inf,1,1,inf],
+    [inf,inf,inf,inf,inf,inf,inf,inf,1,1,1],
+    [inf,inf,inf,inf,inf,inf,inf,inf,inf,inf,1],
+    [inf,inf,inf,inf,inf,inf,inf,inf,inf,inf,1],
+    [inf,inf,inf,inf,inf,inf,inf,inf,inf,inf,inf]]
+
+ancestor_dic = {}  # a dictionary for node ancestor
+discovery_dic = {}  # a dictionary for discovery time
+finish_dic={} # a dictionary for finish time
+color_dic = {} # a dictionary for node color
+
+visiting = [] # create an empty list for visited nodes
+time_record = 0
+
+def depth_first(graph,start,end):
+
+    start = start -1
+    end = end-1
+    vetex = []
+    vetex.extend(range(len(graph)))  # create node list
+
+    # Assign value of ancestor of each node to null
+    for i in range(start, len(graph)):
+        ancestor_dic[i] = ''
+    for i in range(start, len(graph)):
+        color_dic[i] = 'WHITE'
+    print(color_dic)
+
+    for u in vetex:
+        print( " This is U: ",u)
+
+        if color_dic[u]=='WHITE':
+            print(" This is U angain: ", u)
+            dfs_visit(graph,u)
+    i = end
+    route = [i]
+    while i != 0:
+        route.append(ancestor_dic.get(i))
+        i = ancestor_dic.get(i)
+
+    # a = list(map(lambda x: x + 1, a)) another way to add same value to a list
+    route = np.array(route) + 1
+
+    return route, finish_dic[end]
+
+def dfs_visit(graph,vetex):
+    global time_record
+    time_record = time_record+1
+    print("this is time: ",time_record)
+
+    discovery_dic[vetex] = time_record
+    color_dic[vetex] = 'GRAY'
+
+    for i in range(0, len(graph)):
+        if graph[vetex][i] != inf and color_dic[i] == 'WHITE':
+            ancestor_dic[i] = vetex
+            dfs_visit(graph,i)
+    color_dic[vetex] = 'BLACK'
+    time_record = time_record+1
+    finish_dic[vetex] = time_record
+
+    return
+
+path,distance =depth_first(a,1,11)
+print("Here is the path: ", path)
+
+print('distance is : ', distance)
+print("Running time is: " + str(time.process_time()) + " seconds." )
+

@@ -1,0 +1,140 @@
+import numpy as np
+import time
+
+inf = float('inf')
+
+a=[
+    [inf,0,0,0,inf,inf,inf,inf,inf,inf,inf],
+    [inf,inf,0,inf,inf,inf,inf,inf,inf,inf,inf],
+    [inf,inf,inf,0,0,inf,inf,inf,inf,inf,inf],
+    [inf,inf,inf,inf,0,0,0,inf,inf,inf,inf],
+    [inf,inf,inf,inf,inf,inf,0,0,inf,inf,inf],
+    [inf,inf,inf,inf,inf,inf,inf,0,inf,inf,inf],
+    [inf,inf,inf,inf,inf,inf,inf,inf,0,0,inf],
+    [inf,inf,inf,inf,inf,inf,inf,inf,0,0,0],
+    [inf,inf,inf,inf,inf,inf,inf,inf,inf,inf,0],
+    [inf,inf,inf,inf,inf,inf,inf,inf,inf,inf,0],
+    [inf,inf,inf,inf,inf,inf,inf,inf,inf,inf,inf]]
+
+
+
+print(a)
+
+
+# read file from certain directory
+def read_file(filepath):
+    with open(filepath, 'r') as f:
+        x = f.readlines() # read file line by lie
+  
+    city=x[7:] # generate array form line 8 of the file
+
+    city_array=[]
+    index =0
+
+    for index in range(0,len(city)):# split each line with space
+        firstWord, secondWord, thirdWord,*otherWords = city[index].split()
+        #print(firstWord)
+        #print(secondWord)
+        #print(thirdWord)
+        #print(index)
+        city_array.append([])
+        #city_array[index].append(float(firstWord))
+        city_array[index].append(float(secondWord))
+        city_array[index].append(float(thirdWord))
+
+    cities = np.asarray(city_array) # generate array with value of coordinates
+
+    return cities
+
+
+cities = read_file("/Users/bonnyxin/PycharmProjects/project2/11PointDFSBFS.tsp")
+print(cities)
+# fomular of cacularing distance of two cities
+def calDist(index1, index2):
+    return (np.sum(np.power(cities[index1] - cities[index2], 2))) ** 0.5
+
+# now need insert inf to array a
+
+def gen_weight_array(array):
+    for i in range(0,len(array)):
+        for j in range(0,len(array[i])):
+            if array[i][j] != inf:
+                array[i][j] = calDist(i, j)
+            else:
+                continue
+
+    return array
+
+graph_weight = gen_weight_array(a)
+print(graph_weight)
+
+ancestor_dic = {}  # a dictionary for node ancestor
+distance_dic = {}  # a dictionary for node current weight
+visited = {} # create an empty list for visited nodes
+
+def initialize_single_source(graph,start,end):
+    vetex = []
+    vetex.extend(range(len(graph)))  # create node list
+    distance_dic[start-1] = 0 # Assign distance for start node as 0
+    # Assign all other distance value as infinity
+    for i in range(start, len(graph)):
+        distance_dic[i] = inf
+    for i in range(start-1, len(graph)):
+        print(distance_dic[i])
+
+    # Assign value of ancestor of each node to null
+    for i in range(start-1, len(graph)):
+         ancestor_dic[i] = ''
+
+
+    while vetex:
+        # get the shortest neighbours node names
+        u = min(distance_dic, key=distance_dic.get)
+        print( "This is U: " + str(u))
+        print("this is distance: "+ str(distance_dic))
+
+        vetex.remove(u)
+        print("this is vetex: " + str(vetex))
+
+        for current_neighbour in graph[u]:
+            if current_neighbour != inf and graph[u].index(current_neighbour) in vetex:
+                # try add another condition here about distance
+
+                relax(u, graph[u].index(current_neighbour), current_neighbour)
+
+        visited[u] = distance_dic.pop(u)
+
+        print("this is visited: "+ str(visited))
+
+    # drag out the shortest path
+    i = end-1
+    route = [i]
+    while i != 0:
+        route.append(ancestor_dic.get(i))
+        i = ancestor_dic.get(i)
+
+    #a = list(map(lambda x: x + 1, a)) another way to add same value to a list
+    route = np.array(route)+1
+    return visited[end-1],route
+
+
+def relax(current_vertex,neighbour,weight): # set key values to nodes
+    if distance_dic[neighbour] > distance_dic[current_vertex]+weight:
+        distance_dic[neighbour] = distance_dic[current_vertex] + weight
+        ancestor_dic[neighbour] = current_vertex
+    else:
+        return
+
+    return
+
+distance, path = initialize_single_source(graph_weight, 1,11)
+print("Distance is : " + str(distance))
+print("Path is : " + str(path))
+print("\nRunning time is: " + str(time.process_time()) + " seconds." )
+
+
+
+
+
+
+

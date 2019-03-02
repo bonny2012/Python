@@ -1,0 +1,125 @@
+from itertools import permutations,chain
+import numpy as np
+import time
+
+# read file from certain directory
+def read_file(filepath):
+    with open(filepath, 'r') as f:
+        x = f.readlines() # read file line by lie
+    #print(x)
+
+    city=x[7:] # generate array form line 8 of the file
+    #print(city)
+
+    city_array=[]
+    index =0
+
+    for index in range(0,len(city)):# split each line with space
+        firstWord, secondWord, thirdWord,*otherWords = city[index].split()
+        #print(firstWord)
+        #print(secondWord)
+        #print(thirdWord)
+        #print(index)
+        city_array.append([])
+        #city_array[index].append(float(firstWord))
+        city_array[index].append(float(secondWord))
+        city_array[index].append(float(thirdWord))
+
+    #print(city_array)
+    cities = np.asarray(city_array) # generate array with only coordinate
+
+    return cities
+
+
+
+def prepend_append(value1, iterator,value2):
+    #Prepend and append a single value in front of an iterator"
+    # prepend_append(1, [2, 3, 4],1) -> 1 2 3 4 1
+    #add the start city to the begining and end
+    return chain([value1], iterator,[value2])
+
+def gen_paths(values):
+    # generate permutations without the start city
+    paths = list(permutations(range(1,len(values))))
+
+    i=0
+    for i in range(0,len(paths)):
+        paths[i] = list(paths[i])
+        print(paths[i])
+        paths[i] = list(prepend_append(0, paths[i],0))
+
+    return paths
+
+
+# fomular of cacularing distance of two cities
+def calDist(index1, index2):
+    return (np.sum(np.power(cities[index1] - cities[index2], 2))) ** 0.5
+
+#sum all distance of one permutation
+def calPathDist(indexList):
+    sum = 0.0
+    for i in range(1, len(indexList)):
+        sum += calDist(indexList[i], indexList[i - 1])
+    return sum
+
+#generate list with all distances
+def gen_dis_array(paths):
+    dist = []
+
+    for i in range(0,len(paths)):
+        dist.append([])
+        dist[i] = calPathDist(paths[i])
+    return dist
+
+
+# compare all distance
+def comp_paths(distance):
+    temp_dis = float("inf")
+
+    for i in range(0,len(distance)-1):
+        if distance[i] <= distance[i+1] and distance[i] < temp_dis:
+            temp_dis = distance[i]
+        elif distance[i+1] < temp_dis:
+            temp_dis = distance[i+1]
+        else:
+            continue
+    return float(round(temp_dis,2))
+
+
+# find the best path
+def find_path(sh_distance,distance,paths):
+    short_path = []
+
+    for i in range(0, len(distance)):
+        if sh_distance == float(round(distance[i],2)):
+            short_path.append(paths[i])
+        else:
+            continue
+    short_path = np.array(short_path)
+    return short_path+1
+
+
+cities = read_file("/Users/bonnyxin/PycharmProjects/project1_TSP/Random8.tsp")
+
+paths = gen_paths(cities)
+
+distance_array=gen_dis_array(paths)
+print("\n All distance : \n" + str(distance_array))
+
+shortest_distance = comp_paths(distance_array)
+
+print("\nShortest distance is : " + str(shortest_distance))
+
+best_path = find_path(shortest_distance,distance_array,paths)
+
+print("\nBest paths are : \n" + str(best_path))
+
+#print (time.clock() - start_time, "seconds")
+print("\nRunning time is: " + str(time.process_time()) + " seconds." )
+
+
+
+
+
+
+
